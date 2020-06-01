@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tom.mobileapp.transactionservice.MyUserDetails;
 import com.tom.mobileapp.transactionservice.User;
+import com.tom.mobileapp.transactionservice.proxy.SecurityServiceProxy;
 import com.tom.mobileapp.transactionservice.util.JwtUtil;
 
 @Component
@@ -43,6 +44,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private SecurityServiceProxy securityServiceProxy;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -67,33 +71,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 			try {
 
-				HttpHeaders headers = new HttpHeaders();
-				headers.add("Authorization", authorizationHeader);
-				headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-
-				HttpEntity<String> entity = new HttpEntity<String>("", headers);
-
-				
-				  ResponseEntity<String> responseEntity =
-				  restTemplate.exchange("http://localhost:8765/security-auth-server/current",
-				  HttpMethod.POST, entity, String.class);
+				/*
+				 * HttpHeaders headers = new HttpHeaders(); headers.add("Authorization",
+				 * authorizationHeader);
+				 * headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+				 * 
+				 * HttpEntity<String> entity = new HttpEntity<String>("", headers);
+				 * 
+				 * 
+				 * ResponseEntity<String> responseEntity =
+				 * restTemplate.exchange("http://localhost:8765/security-auth-server/current",
+				 * HttpMethod.POST, entity, String.class);
+				 */
 				 
 				
-				/*
-				 * ResponseEntity<CurrencyConversionBean> responseEntity = new
-				 * RestTemplate().getForEntity(
-				 * "http://localhost:8000/currency-exchange/from/{from}/to/{to}",
-				 * CurrencyConversionBean.class, mapValues);
-				 */
-				
-				/*
-				 * ResponseEntity<UserDetails> responseEntity = restTemplate.postForEntity(
-				 * "http://localhost:8765/security-auth-server/current", entity,
-				 * UserDetails.class);
-				 */
-
-				
-				
+				ResponseEntity<String> responseEntity = securityServiceProxy.authorizeSecurity(authorizationHeader);
 				
 				String jsonUserDetails = responseEntity.getBody();
 				
